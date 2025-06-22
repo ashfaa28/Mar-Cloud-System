@@ -49,8 +49,9 @@ func downloadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/upload", uploadHandler)
-	http.HandleFunc("/download", downloadHandler)
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/upload", requireAuth(uploadHandler))
+	http.HandleFunc("/download", requireAuth(downloadHandler))
 
 	fmt.Println("Server berjalan di http://localhost:8080")
 	http.ListenAndServe(":8080", nil)

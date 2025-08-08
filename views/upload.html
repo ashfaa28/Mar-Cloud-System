@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload File</title>
+  <style>
+    /* ====== Area drag & drop ====== */
+    #dropZone {
+      border: 2px dashed #aaa;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.2s ease;
+    }
+    #dropZone.hover {
+      background-color: #eef;
+    }
+    .file-item {
+      margin-bottom: 10px;
+    }
+    .file-progress {
+      width: 100%;
+    }
+    .rename-input {
+      margin-left: 10px;
+      padding: 3px;
+    }
+    .cancel-btn {
+      background: red;
+      color: white;
+      border: none;
+      padding: 5px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Upload Banyak File Sekaligus</h2>
+<form id="multiUploadForm" onsubmit="return false;">
+  <div id="dropZone">Tarik & letakkan file di sini atau klik untuk memilih</div>
+  <input type="file" id="multiFileInput" multiple hidden>
+  
+  <!-- List file -->
+  <div id="fileList"></div>
+
+  <!-- Progress total -->
+  <div id="totalProgress" style="display:none;">
+    <progress id="totalProgressBar" value="0" max="100" style="width: 300px;"></progress>
+  </div>
+  
+  <br>
+  <button id="multiUploadBtn" type="button" disabled>Upload Semua</button>
+</form>
+
+<hr>
+
+<h2>Upload File Jumbo (Chunked)</h2>    
+<div>
+  <input type="file" id="chunkFileInput" required><br><br>
+
+  <!-- Progress per chunk -->
+  <label>Progress per Chunk:</label>
+  <progress id="chunkProgressBar" value="0" max="100" style="width: 300px;"></progress><br><br>
+
+  <!-- Progress total -->
+  <label>Progress Total:</label>
+  <progress id="chunkTotalProgressBar" value="0" max="100" style="width: 300px;"></progress><br><br>
+
+  <button id="chunkUploadBtn" type="button">Upload</button>
+  <button id="pauseBtn" type="button">Pause</button>
+  <button id="resumeBtn" type="button">Resume</button>
+</div>
+
+<!-- JS -->
+<script src="/js/upload.js"></script>
+</body>
+</html>

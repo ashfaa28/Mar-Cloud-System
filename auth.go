@@ -51,24 +51,34 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenStr := r.Header.Get("Authorization")
-		if tokenStr == "" || len(tokenStr) < 8 || tokenStr[:7] != "Bearer " {
+		authHeader := r.Header.Get("Authorization")
+		fmt.Println("Auth Header:", authHeader) // debug
+
+		if authHeader == "" || len(authHeader) < 8 || authHeader[:7] != "Bearer " {
 			http.Error(w, "Token Tidak Valid", http.StatusUnauthorized)
 			return
 		}
 
-		tokenStr = tokenStr[7:] // buang "Bearer "
+		tokenStr := authHeader[7:] // buang "Bearer "
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil
 		})
 
+		fmt.Println("=== AUTH DEBUG ===")
+		fmt.Println("Authorization Header:", authHeader)
+		fmt.Println("Token String:", tokenStr)
+		fmt.Println("Parse error:", err)
+		fmt.Println("Token valid?:", token.Valid)
+
 		if err != nil || !token.Valid {
+			fmt.Println("Token parse error:", err) // debug
 			http.Error(w, "Token expired atau tidak sah", http.StatusUnauthorized)
 			return
 		}
 
+		// token valid → lanjut
 		next.ServeHTTP(w, r)
 	}
 }

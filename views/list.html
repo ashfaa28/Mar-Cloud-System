@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar File</title>
+    <style>
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .file-item button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Daftar File</h2>
+
+    <label for="dateFilter">Filter Tanggal:</label>
+    <input type="date" id="dateFilter">
+
+    <label for="limitSelect">Jumlah per Halaman:</label>
+    <select id="limitSelect">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+    </select>
+
+    <div id="fileList"></div>
+
+    <div>
+        <button id="prevBtn">Prev</button>
+        <span id="pageInfo"></span>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <script src="/js/list.js?v=1.0"></script>
+</body>
+</html>

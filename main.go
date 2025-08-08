@@ -2,57 +2,33 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
+	"time"
 )
 
-const uploadPath = "./uploads"
-
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Cuma boleh pake POST bang", http.StatusMethodNotAllowed)
-		return
-	}
-
-	file, header, err := r.FormFile("file")
-	if err != nil {
-		http.Error(w, "File tidak ditemukan", http.StatusBadRequest)
-		return
-	}
-
-	defer file.Close()
-
-	// Save file
-	dst, err := os.Create(filepath.Join(uploadPath, header.Filename))
-	if err != nil {
-		http.Error(w, "File gabisa di save", http.StatusInternalServerError)
-		return
-	}
-	defer dst.Close()
-
-	io.Copy(dst, file)
-	fmt.Fprintf(w, "Upload sukses : %s\n", header.Filename)
-
-}
-
-func downloadHandler(w http.ResponseWriter, r *http.Request) {
-	filename := r.URL.Query().Get("file")
-	if filename == "" {
-		http.Error(w, "Parameter file hilang", http.StatusBadRequest)
-		return
-	}
-
-	filepath := filepath.Join(uploadPath, filename)
-	http.ServeFile(w, r, filepath)
-}
-
 func main() {
+	InitDB()
+	startChunkCleaner(30*time.Minute, 6*time.Hour) // cek tiap 30 menit, hapus yang lebih tua 6 jam
+
+	http.HandleFunc("/", FormHandler)
 	http.HandleFunc("/login", loginHandler)
-	http.HandleFunc("/upload", requireAuth(uploadHandler))
-	http.HandleFunc("/download", requireAuth(downloadHandler))
+	http.HandleFunc("/upload", requireAuth(UploadHandler))
+	http.HandleFunc("/download", requireAuth(DownloadHandler))
+	http.HandleFunc("/delete", requireAuth(DeleteHandler))
+	http.HandleFunc("/list-json", requireAuth(ListJSONHandler))
+	http.HandleFunc("/upload-chunk", requireAuth(UploadChunkHandler))
+	http.HandleFunc("/merge", requireAuth(MergeChunksHandler))
+	http.HandleFunc("/resume-status", requireAuth(ChunkStatusHandler))
+	http.HandleFunc("/resume", requireAuth(ResumeUploadHandler))
+	http.HandleFunc("/cancel-upload", requireAuth(CancelUploadHandler))
+
+	http.HandleFunc("/login.html", ServeLogin)
+	http.HandleFunc("/upload.html", ServeUpload)
+	http.HandleFunc("/list.html", ServeList)
+
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("views/js"))))
 
 	fmt.Println("Server berjalan di http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("0.0.0.0:8080", nil)
+
 }
